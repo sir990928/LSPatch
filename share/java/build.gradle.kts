@@ -31,3 +31,7 @@ val generateTask = task<Copy>("generateJava") {
 
 sourceSets["main"].java.srcDir("$buildDir/generated/java")
 tasks["compileJava"].dependsOn(generateTask)
+
+dependencies {
+    compileOnly(lspatch.libxposed.api)
+}
