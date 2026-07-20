@@ -12,12 +12,22 @@ commons-io = "2.13.0"
 beust-jcommander = "1.82"
 google-gson = "2.10.1"
 
+# Xposed / libxposed API 版本定义
+# api-v100 对应现代主流 libxposed API 规范
+# api-legacy/50 对应旧版 XposedBridge / 传统 API 规范
+libxposed-api = "100"
+libxposed-api-legacy = "50"
+
 [plugins]
 google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 rikka-tools-refine = { id = "dev.rikka.tools.refine", version.ref = "hiddenapi-refine" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 
 [libraries]
+# Xposed API 兼容库配置
+libxposed-api = { module = "io.github.libxposed:api", version.ref = "libxposed-api" }
+libxposed-api-legacy = { module = "io.github.libxposed:api", version.ref = "libxposed-api-legacy" }
+
 androidx-customview = "androidx.customview:customview:1.2.0-alpha02"
 androidx-customview-poolingcontainer = "androidx.customview:customview-poolingcontainer:1.0.0"
 
