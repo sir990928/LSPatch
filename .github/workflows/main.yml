@@ -51,7 +51,6 @@ jobs:
         path: libxposed/service
         fetch-depth: 0
 
-    # 修复点：移除cache: maven，解决pom.xml不存在报错
     - name: 配置Java17
       uses: actions/setup-java@v4
       with:
@@ -75,9 +74,10 @@ jobs:
       working-directory: libxposed/api
       run: ./gradlew publishApiPublicationToMavenLocal --stacktrace
 
+    # 修复点：使用完整无歧义任务名 publishServicePublicationToMavenLocal
     - name: 发布libxposed-service到本地Maven
       working-directory: libxposed/service
-      run: ./gradlew publishPublicationToMavenLocal --stacktrace
+      run: ./gradlew publishServicePublicationToMavenLocal --stacktrace
 
     - name: 执行全量打包编译
       run: |
