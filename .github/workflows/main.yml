@@ -70,14 +70,15 @@ jobs:
         restore-keys: ${{ runner.os }}
         save: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
 
+    # 关键修复 1：发布 api 时显式指定版本号为 100，并使用通用的 publishToMavenLocal 任务
     - name: 发布libxposed-api到本地Maven
       working-directory: libxposed/api
-      run: ./gradlew publishApiPublicationToMavenLocal --stacktrace
+      run: ./gradlew publishToMavenLocal -Pversion=100 --stacktrace
 
-    # 修复点：使用完整无歧义任务名 publishServicePublicationToMavenLocal
+    # 关键修复 2：发布 service 时同样使用 publishToMavenLocal 避免任务名称歧义
     - name: 发布libxposed-service到本地Maven
       working-directory: libxposed/service
-      run: ./gradlew publishServicePublicationToMavenLocal --stacktrace
+      run: ./gradlew publishToMavenLocal --stacktrace
 
     - name: 执行全量打包编译
       run: |
