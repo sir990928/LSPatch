@@ -13,11 +13,15 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // 优先查找本地 Maven 仓库
         mavenLocal {
             content {
                 includeGroup("io.github.libxposed")
+                includeGroupAndSubgroups("io.github.libxposed")
             }
         }
+        // 补全 JitPack 仓库，防止部分子模块依赖拉取失败
+        maven { url = uri("https://jitpack.io") }
     }
     versionCatalogs {
         create("libs") {
