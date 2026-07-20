@@ -73,23 +73,37 @@ jobs:
     - name: 发布libxposed-api到本地Maven
       working-directory: libxposed/api
       run: |
+        echo "version=100" > gradle.properties
+        # 1. 优先调用官方 publication Task
+        ./gradlew :api:publishApiPublicationToMavenLocal -Pversion=100 --stacktrace || \
+        ./gradlew publishToMavenLocal -Pversion=100 --stacktrace || \
         ./gradlew build -x test
-        JAR_FILE=$(find api/build/libs -name "*.jar" ! -name "*-sources.jar" ! -name "*-javadoc.jar" | head -n 1)
-        if [ -z "$JAR_FILE" ]; then
-          JAR_FILE=$(find build/libs -name "*.jar" ! -name "*-sources.jar" ! -name "*-javadoc.jar" | head -n 1)
+
+        # 2. 如果 Gradle 未能在 ~/.m2 生成 api-100.pom，使用 mvn 进行兜底安装
+        POM_PATH="$HOME/.m2/repository/io/github/libxposed/api/100/api-100.pom"
+        if [ ! -f "$POM_PATH" ]; then
+          TARGET_FILE=$(find . -type f \( -name "*.aar" -o -name "*.jar" \) ! -name "*-sources*" ! -name "*-javadoc*" | head -n 1)
+          if [ -n "$TARGET_FILE" ]; then
+            EXT="${TARGET_FILE##*.}"
+            echo "找到依赖产物: $TARGET_FILE (类型: $EXT)"
+            mvn install:install-file \
+              -Dfile="$TARGET_FILE" \
+              -DgroupId=io.github.libxposed \
+              -DartifactId=api \
+              -Dversion=100 \
+              -Dpackaging="$EXT"
+          else
+            echo "警告: 未找到编译好的 jar/aar 产物"
+          fi
         fi
-        echo "找到 JAR 文件: $JAR_FILE"
-        mvn install:install-file \
-          -Dfile="$JAR_FILE" \
-          -DgroupId=io.github.libxposed \
-          -DartifactId=api \
-          -Dversion=100 \
-          -Dpackaging=jar
+
+        # 验证 Maven 仓库安装结果
+        ls -la "$HOME/.m2/repository/io/github/libxposed/api/100/" || true
 
     - name: 发布libxposed-service到本地Maven
       working-directory: libxposed/service
       run: |
-        ./gradlew build -x test || true
+        ./gradlew :interface:publishInterfacePublicationToMavenLocal --stacktrace || \
         ./gradlew publishToMavenLocal --stacktrace || true
 
     - name: 执行全量打包编译
