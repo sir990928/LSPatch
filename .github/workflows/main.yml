@@ -1,4 +1,4 @@
-Name: LSPatch自动编译
+name: LSPatch自动编译
 
 on:
   workflow_dispatch:
