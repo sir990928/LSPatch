@@ -14,7 +14,7 @@ google-gson = "2.10.1"
 
 # Xposed / libxposed API 版本定义
 # 使用 Maven Central 标准的三位/完整语义化版本号
-libxposed-api = "100.0.0"
+libxposed-api = "101.0.1"
 libxposed-api-legacy = "50"
 
 [plugins]
