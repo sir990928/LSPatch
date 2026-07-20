@@ -32,6 +32,10 @@ val generateTask = task<Copy>("generateJava") {
 sourceSets["main"].java.srcDir("$buildDir/generated/java")
 tasks["compileJava"].dependsOn(generateTask)
 
+// 👇 允许 java-library 模块解析并提取 AAR 中的 classes.jar
 dependencies {
+    artifactTypes.register("aar") {
+        attributes.attribute(ArtifactAttributes.ARTIFACT_FORMAT, "jar")
+    }
     compileOnly(lspatch.libxposed.api)
 }
