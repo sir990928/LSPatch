@@ -1,4 +1,4 @@
-name: LSPatch自动编译
+Name: LSPatch自动编译
 
 on:
   workflow_dispatch:
@@ -57,10 +57,11 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
+    # 关键修复 1：将 gradle-home-cache-cleanup 设为 false，解决 Gradle 8.1.1 内部属性 removeUnusedEntriesOlderThan 报错
     - name: Gradle缓存与环境配置
-      uses: gradle/actions/setup-gradle@v3
+      uses: gradle/actions/setup-gradle@v4
       with:
-        gradle-home-cache-cleanup: true
+        gradle-home-cache-cleanup: false
 
     - name: Ccache编译加速
       uses: hendrikmuhs/ccache-action@v1.2
@@ -70,12 +71,13 @@ jobs:
         restore-keys: ${{ runner.os }}
         save: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
 
-    # 关键修复 1：发布 api 时显式指定版本号为 100，并使用通用的 publishToMavenLocal 任务
+    # 关键修复 2：发布 api 时将 version=100 显式写入 gradle.properties，并加上 -Pversion=100
     - name: 发布libxposed-api到本地Maven
       working-directory: libxposed/api
-      run: ./gradlew publishToMavenLocal -Pversion=100 --stacktrace
+      run: |
+        echo "version=100" >> gradle.properties
+        ./gradlew publishToMavenLocal -Pversion=100 --stacktrace
 
-    # 关键修复 2：发布 service 时同样使用 publishToMavenLocal 避免任务名称歧义
     - name: 发布libxposed-service到本地Maven
       working-directory: libxposed/service
       run: ./gradlew publishToMavenLocal --stacktrace
